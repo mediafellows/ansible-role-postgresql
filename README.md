@@ -1,9 +1,4 @@
-## ANXS - PostgreSQL [![Build Status](https://travis-ci.org/ANXS/postgresql.svg?branch=master)](https://travis-ci.org/ANXS/postgresql)
-
----
-Help Wanted! If you are able and willing to help maintain this Ansible role then please open a GitHub issue. A lot of people seem to use this role and we (quite obviously) need assistance!
-💖
----
+## Ansibl Role - PostgreSQL
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
 
@@ -15,7 +10,7 @@ This has been tested on Ansible 2.4.0 and higher.
 To install:
 
 ```
-ansible-galaxy install ANXS.postgresql
+ansible-galaxy install mediafellows.postgresql
 ```
 
 #### Example Playbook
@@ -25,7 +20,7 @@ Including an example of how to use your role:
     - hosts: postgresql-server
       become: yes
       roles:
-         - { role: anxs.postgresql }
+         - { role: mediafellows.postgresql }
 
 #### Dependencies
 

@@ -2,9 +2,6 @@
 
 extends: default
 
-ignore: |
-  .github/workflows/*
-
 rules:
   document-start: disable
   comments-indentation: disable
@@ -22,6 +19,10 @@ rules:
     max-spaces-after: -1
   line-length:
     max: 180
+    ignore: |
+      tasks/databases.yml
+      tasks/install_yum.yml
+      defaults/main.yml
   new-lines:
     type: unix
   indentation:

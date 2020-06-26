@@ -8,36 +8,29 @@ galaxy_info:
   license: MIT
 
   platforms:
-  - name: Debian
-    versions:
-    - jessie
-    - stretch
-  - name: Ubuntu
-    versions:
-    - xenial
-    - bionic
-  - name: EL
-    versions:
-    - 6
-    - 7
-#
-# DISABLED
-#
-#  - name: Fedora
-#    versions:
-#    - 27
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+    - name: EL
+      versions:
+        - 6
+        - 7
 
   galaxy_tags:
-  - postgresql
-  - postgres
-  - database
-  - database:sql
-  - sql
-  - postgis
-  - debian
-  - ubuntu
-  - centos
-  - redhat
-  - fedora
+    - postgresql
+    - postgres
+    - database
+    - database:sql
+    - sql
+    - postgis
+    - debian
+    - ubuntu
+    - centos
+    - redhat
 
 dependencies: []
