@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/mediafellows/ansible-role-postgresql.svg?branch=master)](https://travis-ci.com/mediafellows/ansible-role-postgresql)
+
 ## Ansibl Role - PostgreSQL
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
