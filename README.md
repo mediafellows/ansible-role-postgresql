@@ -4,6 +4,7 @@
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
 
+This is just a fork of https://github.com/ANXS/postgresql
 
 #### Installation
 
