@@ -1,10 +1,10 @@
-[![Build Status](https://travis-ci.com/mediafellows/ansible-role-postgresql.svg?branch=master)](https://travis-ci.com/mediafellows/ansible-role-postgresql)
+[![Ansible-Role Tests](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml/badge.svg)](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml)
 
 ## Ansibl Role - PostgreSQL
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
 
-This is just a fork of https://github.com/ANXS/postgresql
+**This is just a fork** of https://github.com/ANXS/postgresql
 
 #### Installation
 
@@ -27,29 +27,7 @@ Including an example of how to use your role:
 
 #### Dependencies
 
-- ANXS.monit ([Galaxy](https://galaxy.ansible.com/list#/roles/502)/[GH](https://github.com/ANXS/monit)) if you want monit protection (in that case, you should set `monit_protection: true`)
-
-
-#### Compatibility matrix
-
-| Distribution / PostgreSQL | <= 9.3 | 9.4 | 9.5 | 9.6 | 10 | 11 | 12 |
-| ------------------------- |:---:|:---:|:---:|:---:|:--:|:--:|:--:|
-| Ubuntu 14.04 | :no_entry: | :no_entry:| :no_entry:| :no_entry:| :no_entry:| :no_entry:| :no_entry:|
-| Ubuntu 16.04 | :no_entry: | :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:|
-| Debian 8.x | :no_entry: | :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:|
-| Debian 9.x | :no_entry: | :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:|
-| CentOS 6.x | :no_entry: | :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:|
-| CentOS 7.x | :no_entry: | :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:| :white_check_mark:|
-| CentOS 8.x | :no_entry: | :grey_question:| :grey_question:| :grey_question:| :grey_question:| :grey_question:| :grey_question:|
-| Fedora latest | :no_entry: | :x:| :x:| :x:| :x:| :x:| :x:|
-
-- :white_check_mark: - tested, works fine
-- :warning: - Not for production use
-- :grey_question: - will work in the future (help out if you can)
-- :interrobang: - maybe works, not tested
-- :no_entry: - Has reached End of Life (EOL)
-
-
+None
 
 #### Variables
 
@@ -116,45 +94,6 @@ postgresql_user_privileges:
 There's a lot more knobs and bolts to set, which you can find in the [defaults/main.yml](./defaults/main.yml)
 
 
-#### Testing
-
-This project comes with a Vagrantfile, this is a fast and easy way to test changes to the role, fire it up with `vagrant up`
-
-See [vagrant docs](https://docs.vagrantup.com/v2/) for getting setup with vagrant
-
-Once your VM is up, you can reprovision it using either `vagrant provision`, or `ansible-playbook tests/playbook.yml -i vagrant-inventory`
-
-If you want to toy with the test play, see [tests/playbook.yml](./tests/playbook.yml), and change the variables in [tests/vars.yml](./tests/vars.yml)
-
-If you are contributing, please first test your changes within the vagrant environment, (using the targeted distribution), and if possible, ensure your change is covered in the tests found in [.travis.yml](./.travis.yml)
-
-
 #### License
 
 Licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
-
-#### Thanks
-
-Creator:
-- [Pjan Vandaele](https://github.com/pjan)
-
-Maintainers:
-- [Jonathan Lozada D.](https://github.com/jlozadad)
-- [Jonathan Freedman](https://github.com/otakup0pe)
-- [Sergei Antipov](https://github.com/UnderGreen)
-- [Greg Clough](https://github.com/gclough)
-
-Top Contributors:
-- [David Farrington](https://github.com/farridav)
-- [Jesse Lang](https://github.com/jesselang)
-- [Michael Conrad](https://github.com/MichaelConrad)
-- [Sébastien Alix](https://github.com/sebalix)
-- [Copperfield](https://github.com/Copperfield)
-
-- [Ralph von der Heyden](https://github.com/ralph)
-
-
-#### Feedback, bug-reports, requests, ...
-
-Are [welcome](https://github.com/ANXS/postgresql/issues)!

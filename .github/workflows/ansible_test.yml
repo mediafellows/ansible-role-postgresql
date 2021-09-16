@@ -6,7 +6,7 @@ on: [ push, pull_request ]
 jobs:
   ansible-test:
     name: Linting and Ansible Testing
-    runs-on: ubunbut-latest
+    runs-on: ubuntu-latest
     env:
       ANSIBLE_FORCE_COLOR: true
     steps:
