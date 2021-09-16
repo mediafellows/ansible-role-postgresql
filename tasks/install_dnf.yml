@@ -1,16 +1,16 @@
-# file: postgresql/tasks/install_dnf.yml
+---
 
 # The standard ca-certs are needed because without them dnf will fail to
 # validate www.postgresql.org (or probably any other source).
 
 - block:
     - name: PostgrSQL | Install all the required dependencies | dnf
-      dnf:
+      ansible.builtin.dnf:
         name: "ca-certificates, python-pycurl, glibc-common, libselinux-python, python*-psycopg2"
         state: present
 
     - name: PostgreSQL | Add yum Repository | dnf
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: postgresql
         state: present
         description: postgresql yum repo
@@ -19,13 +19,13 @@
       when: postgresql_install_repository
 
     - name: PostgreSQL | Install PostgreSQL | dnf
-      dnf:
+      ansible.builtin.dnf:
         name: "postgresql{{ postgresql_version_terse }}-server,postgresql{{ postgresql_version_terse }},postgresql{{ postgresql_version_terse }}-contrib"
         state: present
       environment: "{{ postgresql_env }}"
 
     - name: PostgreSQL | PGTune | dnf
-      dnf:
+      ansible.builtin.dnf:
         name: pgtune
         state: present
       environment: "{{ postgresql_env }}"

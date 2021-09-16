@@ -1,12 +1,12 @@
-# file: postgresql/tasks/users.yml
+---
 
 - name: PostgreSQL | Ensure PostgreSQL is running
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: started
 
 - name: PostgreSQL | Make sure the PostgreSQL users are present
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: "{{ item.name }}"
     password: "{{ item.pass | default(omit) }}"
     encrypted: "{{ item.encrypted | default(omit) }}"

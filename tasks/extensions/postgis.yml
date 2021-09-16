@@ -1,12 +1,14 @@
-# file: postgresql/tasks/extensions/postgis.yml
+---
 
-- include_vars: "{{ item }}"
+- name: Load OS disitribution specific vars from vars files
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
   with_first_found:
     - "../vars/{{ ansible_distribution_release }}.yml"
     - "../vars/empty.yml"
 
 - name: PostgreSQL | Extensions | Make sure the postgis extensions are installed | Debian
-  apt:
+  ansible.builtin.apt:
     name: "{{ postgresql_ext_postgis_deps }}"
     state: present
     update_cache: yes
@@ -16,7 +18,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the postgis extensions are installed | RedHat
-  yum:
+  ansible.builtin.yum:
     name: "{{ postgresql_ext_postgis_deps }}"
     state: present
     update_cache: yes
@@ -25,7 +27,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the postgis extensions are installed | Fedora
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ postgresql_ext_postgis_deps }}"
     state: present
   when: ansible_pkg_mgr == "dnf" and ansible_distribution == "Fedora"

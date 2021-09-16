@@ -1,7 +1,7 @@
-# file: postgresql/tasks/extensions/dev_headers.yml
+---
 
 - name: PostgreSQL | Extensions | Make sure the development headers are installed | Debian
-  apt:
+  ansible.builtin.apt:
     name: libpq-dev
     state: present
     update_cache: yes
@@ -11,7 +11,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the development headers are installed | RedHat
-  yum:
+  ansible.builtin.yum:
     name:
       - "postgresql{{ postgresql_version_terse }}-libs"
       - "postgresql{{ postgresql_version_terse }}-devel"
@@ -22,7 +22,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the development headers are installed | Fedora
-  dnf:
+  ansible.bultin.dnf:
     name:
       - "postgresql{{ postgresql_version_terse }}-libs"
       - "postgresql{{ postgresql_version_terse }}-devel"

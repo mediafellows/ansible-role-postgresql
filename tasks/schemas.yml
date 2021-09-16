@@ -1,7 +1,7 @@
-# file: postgresql/tasks/schemas.yml
+---
 
 - name: PostgreSQL | Add Schema to databases
-  postgresql_schema:
+  community.postgresql.postgresql_schema:
     database: "{{ item.database }}"
     schema: "{{ item.schema }}"
     owner: "{{ item.owner | default(postgresql_database_owner) }}"

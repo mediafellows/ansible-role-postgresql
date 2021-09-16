@@ -1,14 +1,14 @@
-# file: postgresql/tasks/configure.yml
+---
 
 - name: PostgreSQL | Drop the data directory | RedHat
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_data_directory }}"
     state: absent
   register: pgdata_dir_remove
   when: ansible_os_family == "RedHat" and postgresql_cluster_reset
 
 - name: PostgreSQL | Make sure the postgres data directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_data_directory }}"
     owner: "{{ postgresql_service_user }}"
     group: "{{ postgresql_service_group }}"
@@ -17,7 +17,7 @@
   register: pgdata_dir_exist
 
 - name: PostgreSQL | Make sure the postgres WAL directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_wal_directory }}"
     owner: "{{ postgresql_service_user }}"
     group: "{{ postgresql_service_group }}"
@@ -27,7 +27,7 @@
   when: postgresql_wal_directory != ""
 
 - name: PostgreSQL | Make sure the postgres log directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_log_directory }}"
     owner: "{{ postgresql_service_user }}"
     group: "{{ postgresql_service_group }}"
@@ -55,28 +55,30 @@
   ignore_errors: yes
 
 - name: PostgreSQL | Stop PostgreSQL | Debian
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: stopped
   become: yes
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
 - name: PostgreSQL | Reset the cluster - drop the existing one | Debian
-  shell: pg_dropcluster {{ postgresql_version }} {{ postgresql_cluster_name }}
+  ansible.builtin.shell:
+    cmd: pg_dropcluster {{ postgresql_version }} {{ postgresql_cluster_name }}
   become: yes
   become_user: "{{ postgresql_service_user }}"
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
 - name: PostgreSQL | Reset the cluster - create a new one (with specified encoding and locale) | Debian
-  shell: >
-    pg_createcluster --locale {{ postgresql_locale }}
-    -e {{ postgresql_encoding }} -d {{ postgresql_data_directory }}
-    {{ postgresql_version }} {{ postgresql_cluster_name }}
-    --
-    {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
-    {% if postgresql_pwfile != "" %}--pwfile={{ postgresql_pwfile }} {% endif %}
-    {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '<') %}--xlogdir={{ postgresql_wal_directory }} {% endif %}
-    {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '>=') %}--waldir={{ postgresql_wal_directory }} {% endif %}
+  ansible.builtin.shell:
+    cmd: >
+      pg_createcluster --locale {{ postgresql_locale }}
+      -e {{ postgresql_encoding }} -d {{ postgresql_data_directory }}
+      {{ postgresql_version }} {{ postgresql_cluster_name }}
+      --
+      {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
+      {% if postgresql_pwfile != "" %}--pwfile={{ postgresql_pwfile }} {% endif %}
+      {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '<') %}--xlogdir={{ postgresql_wal_directory }} {% endif %}
+      {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '>=') %}--waldir={{ postgresql_wal_directory }} {% endif %}
   become: yes
   become_user: "{{ postgresql_service_user }}"
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
@@ -87,7 +89,7 @@
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
 - name: PostgreSQL | Start PostgreSQL | Debian
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: started
   become: yes
@@ -119,7 +121,7 @@
   changed_when: false
 
 - name: PostgreSQL | Ensure configuration directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ postgresql_conf_directory }}"
     owner: "{{ postgresql_service_user }}"
     group: "{{ postgresql_service_group }}"
@@ -127,7 +129,7 @@
     state: directory
 
 - name: PostgreSQL | Update configuration - pt. 1 (pg_hba.conf)
-  template:
+  ansible.builtin.template:
     src: pg_hba.conf.j2
     dest: "{{ postgresql_conf_directory }}/pg_hba.conf"
     owner: "{{ postgresql_service_user }}"
@@ -136,7 +138,7 @@
   register: postgresql_configuration_pt1
 
 - name: PostgreSQL | Update configuration - pt. 2 (postgresql.conf)
-  template:
+  ansible.builtin.template:
     src: "postgresql.conf-{{ postgresql_version }}.j2"
     # if using pgtune, save the template to ".untuned"
     dest: "{{ postgresql_conf_directory }}/postgresql.conf{% if postgresql_pgtune %}.untuned{% endif %}"
@@ -148,27 +150,27 @@
 - name: PostgreSQL | Update configuration - pt. 3 (pgtune)
   become: true
   become_user: "{{ postgresql_service_user }}"
-  shell: |
-    set -e
-    TMPDIR=$(mktemp -d)
-    pgtune --input-config=postgresql.conf.untuned\
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      TMPDIR=$(mktemp -d)
+      pgtune --input-config=postgresql.conf.untuned\
            --output-config=$TMPDIR/postgresql.conf\
            {% if postgresql_pgtune_memory %}--memory {{ postgresql_pgtune_memory|int }}{% endif %}\
            --type {{ postgresql_pgtune_type|quote }}\
            {% if postgresql_pgtune_connections %}--connections {{ postgresql_pgtune_connections|int }}{% endif %}\
-    # Compare the current config with the one procuded by pgtune (ignoring comments/blanks)
-    if diff --ignore-blank-lines \
+      # Compare the current config with the one procuded by pgtune (ignoring comments/blanks)
+      if diff --ignore-blank-lines \
         <(sed -e 's/#.*//' postgresql.conf) \
         <(sed -e 's/#.*//' $TMPDIR/postgresql.conf)
-    then
-      echo '_OK_'
-    else
-      cp $TMPDIR/postgresql.conf postgresql.conf
-    fi
-    # Cleanup
-    rm $TMPDIR/postgresql.conf
-    rmdir $TMPDIR
-  args:
+      then
+        echo '_OK_'
+      else
+        cp $TMPDIR/postgresql.conf postgresql.conf
+      fi
+      # Cleanup
+      rm $TMPDIR/postgresql.conf
+      rmdir $TMPDIR
     chdir: "{{ postgresql_conf_directory }}"
     executable: "/bin/bash"
   when: postgresql_pgtune
@@ -176,7 +178,7 @@
   changed_when: "'_OK_' not in postgresql_configuration_pt3.stdout"
 
 - name: PostgreSQL | Update configuration - pt. 4 (pg_ident.conf)
-  template:
+  ansible.builtin.template:
     src: pg_ident.conf.j2
     dest: "{{ postgresql_ident_file }}"
     owner: "{{ postgresql_service_user }}"
@@ -186,7 +188,7 @@
   notify: restart postgresql
 
 - name: PostgreSQL | Create folder for additional configuration files
-  file:
+  ansible.builtin.file:
     name: "{{ postgresql_conf_directory }}/conf.d"
     state: directory
     owner: "{{ postgresql_service_user }}"
@@ -194,7 +196,7 @@
     mode: 0755
 
 - name: PostgreSQL | Ensure the systemd directory for PostgreSQL exists | RedHat
-  file:
+  ansible.builtin.file:
     name: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d"
     state: directory
     mode: 0755
@@ -202,14 +204,14 @@
   notify: restart postgresql
 
 - name: PostgreSQL | Use the conf directory when starting the Postgres service | RedHat
-  template:
+  ansible.builtin.template:
     src: etc_systemd_system_postgresql.service.d_custom.conf.j2
     dest: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d/custom.conf"
   when: ansible_os_family == "RedHat"
   register: postgresql_systemd_custom_conf
 
 - name: PostgreSQL | Ensure the pid directory for PostgreSQL exists
-  file:
+  ansible.builtin.file:
     name: "{{ postgresql_pid_directory }}"
     state: directory
     owner: "{{ postgresql_service_user }}"
@@ -218,7 +220,7 @@
   notify: restart postgresql
 
 - name: PostgreSQL | Reload all conf files
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: reloaded
   when: postgresql_configuration_pt1.changed or postgresql_configuration_pt2.changed or postgresql_configuration_pt3.changed or postgresql_systemd_custom_conf.changed

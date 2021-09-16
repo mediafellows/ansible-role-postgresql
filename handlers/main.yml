@@ -1,7 +1,7 @@
-# file: postgresql/handlers/main.yml
+# mediafellows.postgresql main handler file
 
 - name: restart postgresql
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_service_name }}"
     state: restarted
     enabled: yes

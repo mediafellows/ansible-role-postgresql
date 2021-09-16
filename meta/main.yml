@@ -1,4 +1,4 @@
-# file: postgresql/meta/main.yml
+---
 
 galaxy_info:
   role_name: postgresql

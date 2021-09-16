@@ -1,16 +1,16 @@
-# file: postgresql/tasks/install_yum.yml
+---
 
 # The standard ca-certs are needed because  without them yum will fail to
 # validate www.postgresql.org (or probably any other source).
 
 - block:
     - name: PostgreSQL | Install all the required dependencies | yum
-      yum:
+      ansible.builtin.yum:
         name: ["ca-certificates", "python-psycopg2", "python-pycurl", "glibc-common", "epel-release", "libselinux-python"]
         state: present
 
     - name: PostgreSQL | Add PostgreSQL repository | yum
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: postgresql
         description: postgresql yum repo
         baseurl: "{{ postgresql_yum_repository_baseurl }}"
@@ -18,13 +18,13 @@
       when: postgresql_install_repository
 
     - name: PostgreSQL | Make sure the dependencies are installed | yum
-      yum:
+      ansible.builtin.yum:
         name: ["python-psycopg2", "python-pycurl", "glibc-common", "libselinux-python"]
         state: present
         update_cache: yes
 
     - name: PostgreSQL | Install PostgreSQL | yum
-      yum:
+      ansible.builtin.yum:
         name:
           - "postgresql{{ postgresql_version_terse }}-server"
           - "postgresql{{ postgresql_version_terse }}"
@@ -33,7 +33,7 @@
       environment: "{{ postgresql_env }}"
 
     - name: PostgreSQL | Setup service users profile | yum
-      template:
+      ansible.builtin.template:
         src: pgsql_profile.j2
         dest: "~{{ postgresql_service_user }}/.pgsql_profile"
         owner: "{{ postgresql_service_user }}"
@@ -42,7 +42,7 @@
       when: postgresql_service_user_pgsql_profile
 
     - name: PostgreSQL | Create ~/pgtab.example | yum
-      template:
+      ansible.builtin.template:
         src: pgtab.j2
         dest: "~{{ postgresql_service_user }}/pgtab.example"
         owner: "{{ postgresql_service_user }}"
@@ -51,7 +51,7 @@
       when: postgresql_service_user_pgsql_profile
 
     - name: PostgreSQL | Create ~/pgtab header | yum
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
         group: "{{ postgresql_service_group }}"
@@ -63,7 +63,7 @@
       when: postgresql_service_user_pgsql_profile
 
     - name: PostgreSQL | Create ~/pgtab Ansible warning | yum
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
         group: "{{ postgresql_service_group }}"
@@ -74,7 +74,7 @@
       when: postgresql_service_user_pgsql_profile
 
     - name: PostgreSQL | Add database to ~/pgtab | yum
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
         group: "{{ postgresql_service_group }}"
@@ -84,7 +84,7 @@
       when: postgresql_service_user_pgsql_profile
 
     - name: PostgreSQL | PGTune | yum
-      yum:
+      ansible.builtin.yum:
         name: pgtune
         state: present
       environment: "{{ postgresql_env }}"

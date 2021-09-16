@@ -1,7 +1,7 @@
-# file: postgresql/tasks/extensions/contrib.yml
+---
 
 - name: PostgreSQL | Extensions | Make sure the postgres contrib extensions are installed | Debian
-  apt:
+  ansible.builtin.apt:
     name: "postgresql-contrib-{{ postgresql_version }}"
     state: present
     update_cache: yes
@@ -11,7 +11,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the postgres contrib extensions are installed | RedHat
-  yum:
+  ansible.builtin.yum:
     name: "postgresql{{ postgresql_version_terse }}-contrib"
     state: present
   when: ansible_pkg_mgr == "yum" and ansible_distribution == "RedHat"
@@ -19,7 +19,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the postgres contrib extensions are installed | Fedora
-  dnf:
+  ansible.builtin.dnf:
     name: "postgresql{{ postgresql_version_terse }}-contrib"
     state: present
   when: ansible_pkg_mgr == "dnf" and ansible_distribution == "Fedora"

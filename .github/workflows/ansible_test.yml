@@ -1,0 +1,40 @@
+# Github action testing Ansible role
+
+name: Ansible-Role Tests
+on: [ push, pull_request ]
+
+jobs:
+  ansible-test:
+    name: Linting and Ansible Testing
+    runs-on: ubunbut-latest
+    env:
+      ANSIBLE_FORCE_COLOR: true
+    steps:
+
+      - name: Checkout code from Github
+        uses: actions/checkout@v2
+
+      - name: Install Yamllint through pip
+        run: |
+          pip install yamllint
+          yamllint --version
+
+      - name: Run YAML linting (yamllint)
+        run: yamllint .
+
+      - name: Install Ansible through pip
+        run: |
+          pip install ansible
+          ansible --version
+
+      - name: Place ansible.cfg file to point to correct roles dir
+        run: "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+
+      - name: Ansible syntax check mode
+        run: ansible-playbook -i tests/inventory tests/test.yml --syntax-check
+
+      - name: Run Ansible for real
+        run: ansible-playbook -i tests/inventory tests/test.yml
+
+      - name: Rerun Ansible for idempotence check (allow less changes)
+        run: "ansible-playbook -i tests/inventory tests/test.yml | grep -q 'changed=4.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)"
