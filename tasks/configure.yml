@@ -46,7 +46,8 @@
 
 - name: PostgreSQL | Ensure the locale is generated | RedHat
   become: yes
-  command: localedef -c -i {{ item.parts[0] }} -f {{ item.parts[1] }} {{ item.locale_name }}
+  ansible.builtin.command:
+    cmd: localedef -c -i {{ item.parts[0] }} -f {{ item.parts[1] }} {{ item.locale_name }}
   changed_when: false
   with_items:
     - { parts: "{{ postgresql_locale_parts }}", locale_name: "{{ postgresql_locale }}" }
@@ -84,7 +85,8 @@
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
 - name: PostgreSQL | Update systemd | Debian
-  command: systemctl daemon-reload
+  ansible.builtin.command:
+    cmd: systemctl daemon-reload
   become: yes
   when: ansible_os_family == "Debian" and postgresql_cluster_reset and pgdata_dir_exist.changed
 
@@ -102,13 +104,14 @@
   register: pgdata_dir_initialized
 
 - name: PostgreSQL | Initialize the database | RedHat
-  command: >
-    {{ postgresql_bin_directory }}/initdb -D {{ postgresql_data_directory }}
-    --locale={{ postgresql_locale }} --encoding={{ postgresql_encoding }}
-    {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
-    {% if postgresql_pwfile != "" %}--pwfile={{ postgresql_pwfile }} {% endif %}
-    {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '<') %}--xlogdir={{ postgresql_wal_directory }} {% endif %}
-    {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '>=') %}--waldir={{ postgresql_wal_directory }} {% endif %}
+  ansible.builtin.command:
+    cmd: >
+      {{ postgresql_bin_directory }}/initdb -D {{ postgresql_data_directory }}
+      --locale={{ postgresql_locale }} --encoding={{ postgresql_encoding }}
+      {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
+      {% if postgresql_pwfile != "" %}--pwfile={{ postgresql_pwfile }} {% endif %}
+      {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '<') %}--xlogdir={{ postgresql_wal_directory }} {% endif %}
+      {% if postgresql_wal_directory != "" and postgresql_version is version_compare('10', '>=') %}--waldir={{ postgresql_wal_directory }} {% endif %}
   become: yes
   become_user: "{{ postgresql_service_user }}"
   when: ansible_os_family == "RedHat" and
@@ -117,7 +120,7 @@
          not pgdata_dir_initialized.stat.exists)
 
 - name: PostgreSQL | Verify postgresql cluster version
-  command: grep ^{{ postgresql_version }}$ {{ postgresql_data_directory }}/PG_VERSION
+  ansible.builtin.command: grep ^{{ postgresql_version }}$ {{ postgresql_data_directory }}/PG_VERSION
   changed_when: false
 
 - name: PostgreSQL | Ensure configuration directory exists
