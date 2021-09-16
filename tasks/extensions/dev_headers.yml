@@ -22,7 +22,7 @@
     - restart postgresql
 
 - name: PostgreSQL | Extensions | Make sure the development headers are installed | Fedora
-  ansible.bultin.dnf:
+  ansible.builtin.dnf:
     name:
       - "postgresql{{ postgresql_version_terse }}-libs"
       - "postgresql{{ postgresql_version_terse }}-devel"
