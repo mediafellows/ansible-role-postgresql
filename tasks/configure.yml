@@ -121,6 +121,7 @@
 
 - name: PostgreSQL | Verify postgresql cluster version
   ansible.builtin.command: grep ^{{ postgresql_version }}$ {{ postgresql_data_directory }}/PG_VERSION
+  become: yes
   changed_when: false
 
 - name: PostgreSQL | Ensure configuration directory exists
