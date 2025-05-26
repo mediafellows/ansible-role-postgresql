@@ -125,6 +125,7 @@ postgresql_unix_socket_permissions: "0777" # begin with 0 to use octal notation
 postgresql_bonjour: off      # advertise server via Bonjour
 postgresql_bonjour_name: ""  # defaults to the computer name
 
+postgresql_reserved_connections: 0
 
 # - Security and Authentication -
 
