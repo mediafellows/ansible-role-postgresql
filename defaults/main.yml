@@ -163,7 +163,7 @@ postgresql_tcp_keepalives_idle: 0
 postgresql_tcp_keepalives_interval: 0
 postgresql_tcp_keepalives_count: 0
 postgresql_tcp_user_timeout: 0                                      # (>= 12)
-
+postgresql_client_connection_check_interval: 0                      # (>= 14)
 
 #------------------------------------------------------------------------------
 # RESOURCE USAGE (except WAL)
