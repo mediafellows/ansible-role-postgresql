@@ -1,4 +1,4 @@
----
+# file: tasks/databases.yml
 
 - name: PostgreSQL | Ensure PostgreSQL is running
   ansible.builtin.service:
@@ -14,8 +14,8 @@
     lc_ctype: "{{ item.lc_ctype | default(postgresql_ctype) }}"
     port: "{{ postgresql_port }}"
     template: "template0"
-    state: present
-    login_user: "{{ postgresql_admin_user }}"
+    state: "{{ item.state | default('present') }}"
+    login_user: "{{postgresql_admin_user}}"
   become: yes
   become_user: "{{ postgresql_admin_user }}"
   with_items: "{{ postgresql_databases }}"

@@ -1,4 +1,4 @@
----
+# file: tasks/extensions.yml
 
 - ansible.builtin.import_tasks: extensions/contrib.yml
   when: postgresql_ext_install_contrib
@@ -8,3 +8,6 @@
 
 - ansible.builtin.import_tasks: extensions/postgis.yml
   when: postgresql_ext_install_postgis
+
+- ansible.builtin.import_tasks: extensions/extra_packages.yml
+  when: postgresql_ext_install_extra_packages

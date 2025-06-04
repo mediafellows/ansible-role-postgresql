@@ -1,4 +1,5 @@
 ---
+# file: tasks/users_privileges.yml
 
 - name: PostgreSQL | Update the user privileges
   community.postgresql.postgresql_user:
