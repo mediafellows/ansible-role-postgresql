@@ -26,6 +26,7 @@ rules:
       tasks/databases.yml
       tasks/install_yum.yml
       defaults/main.yml
+      vars/*
   new-lines:
     type: unix
   indentation:
