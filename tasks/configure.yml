@@ -133,6 +133,7 @@
     cmd: grep ^{{ postgresql_version }}$ {{ postgresql_data_directory }}/PG_VERSION
   become: yes
   changed_when: false
+  ignore_errors: true
 
 - name: PostgreSQL | Ensure configuration directory exists
   ansible.builtin.file:
