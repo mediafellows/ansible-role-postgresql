@@ -50,9 +50,6 @@
 - ansible.builtin.import_tasks: schemas.yml
   tags: [postgresql, postgresql-schemas]
 
-- ansible.builtin.import_tasks: users_privileges.yml
-  tags: [postgresql, postgresql-users]
-
 - ansible.builtin.import_tasks: monit.yml
   when: monit_protection is defined and monit_protection == true
   tags: [postgresql, postgresql-monit]
