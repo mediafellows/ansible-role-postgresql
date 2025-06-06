@@ -1,10 +1,11 @@
 ---
-# mediafellows.postgresql main tasks file
+# file: postgresql/tasks/main.yml
 
 - name: Load OS specific vars from vars files
   ansible.builtin.include_vars:
     file: "{{ item }}"
   with_first_found:
+    - "../vars/{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
     - "../vars/{{ ansible_os_family }}.yml"
     - "../vars/empty.yml"
   tags: [always]
@@ -21,11 +22,13 @@
   when: ansible_pkg_mgr == "apt"
   tags: [postgresql, postgresql-install]
 
-- ansible.builtin.import_tasks: install_yum.yml
-  when: ansible_pkg_mgr == "yum" and ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "OracleLinux")
+- ansible.builtin.import_tasks: install_rhel.yml
+  when:
+    - (ansible_pkg_mgr == "yum" or ansible_pkg_mgr == "dnf")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "OracleLinux" or ansible_distribution == "Rocky")
   tags: [postgresql, postgresql-install]
 
-- ansible.builtin.import_tasks: install_dnf.yml
+- ansible.builtin.import_tasks: install_fedora.yml
   when: ansible_pkg_mgr == "dnf" and ansible_distribution == "Fedora"
   tags: [postgresql, postgresql-install]
 
@@ -47,8 +50,12 @@
 - ansible.builtin.import_tasks: schemas.yml
   tags: [postgresql, postgresql-schemas]
 
-- ansible.builtin.import_tasks: users_privileges.yml
+- ansible.builtin.import_tasks: db_privileges.yml
   tags: [postgresql, postgresql-users]
+
+- ansible.builtin.import_tasks: monit.yml
+  when: monit_protection is defined and monit_protection == true
+  tags: [postgresql, postgresql-monit]
 
 - ansible.builtin.import_tasks: check_pg_version_mismatch.yml
   tags: [postgresql, postgresql-version-mismatch]

@@ -4,7 +4,7 @@
   hosts: localhost
   become: true
   vars:
-    postgresql_version: 12
+    postgresql_version: 17
     postgresql_port: 5433
     postgresql_databases:
       - name: foobar
@@ -13,13 +13,11 @@
       - name: baz
         pass: md51a1dc91c907325c69271ddf0c944bc72
         encrypted: yes
+        role_attr_flags: SUPERUSER,INHERIT,CREATEDB,CREATEROLE,LOGIN
       - name: zab
         pass: md51a1dc91c907325c69271ddf0c944bc72
         encrypted: yes
       - name: zabaz
-    postgresql_user_privileges:
-      - name: baz
-        db: foobar
     postgresql_database_schemas:
       - database: foobar
         state: present

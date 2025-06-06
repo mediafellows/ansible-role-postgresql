@@ -1,6 +1,6 @@
 [![Ansible-Role Tests](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml/badge.svg)](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml)
 
-## Ansibl Role - PostgreSQL
+## Ansible Role - PostgreSQL
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
 
@@ -82,13 +82,6 @@ postgresql_database_schemas:
     schema: acme_baz           # schema name
     owner: baz                 # owner name
     state: present
-
-# List of user privileges to be applied (optional)
-postgresql_user_privileges:
-  - name: baz                   # user name
-    db: foobar                  # database
-    priv: "ALL"                 # privilege string format: example: INSERT,UPDATE/table:SELECT/anothertable:ALL
-    role_attr_flags: "CREATEDB" # role attribute flags
 ```
 
 There's a lot more knobs and bolts to set, which you can find in the [defaults/main.yml](./defaults/main.yml)

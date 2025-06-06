@@ -1,38 +1,45 @@
 ---
+# file: /tasks/install_rhel.yml
 
 # The standard ca-certs are needed because  without them yum will fail to
 # validate www.postgresql.org (or probably any other source).
 
 - block:
-    - name: PostgreSQL | Install all the required dependencies | yum
+    - name: PostgreSQL | Install all the required dependencies (yum) | RHEL
       ansible.builtin.yum:
-        name: ["ca-certificates", "python-psycopg2", "python-pycurl", "glibc-common", "epel-release", "libselinux-python"]
+        name: "{{ postgresql_packages }}"
         state: present
+        update_cache: yes
 
-    - name: PostgreSQL | Add PostgreSQL repository | yum
+    - name: PostgreSQL | Add PostgreSQL repository | RHEL
       ansible.builtin.yum_repository:
         name: postgresql
         description: postgresql yum repo
         baseurl: "{{ postgresql_yum_repository_baseurl }}"
         gpgkey: "{{ postgresql_yum_repository_gpgkey }}"
+        enabled: yes
       when: postgresql_install_repository
 
-    - name: PostgreSQL | Make sure the dependencies are installed | yum
-      ansible.builtin.yum:
-        name: ["python-psycopg2", "python-pycurl", "glibc-common", "libselinux-python"]
-        state: present
-        update_cache: yes
+    - name: PostgreSQL | Disable postgresql module (necessary for RHEL8+)
+      ansible.builtin.command:
+        cmd: dnf module disable postgresql -y
+      when: "ansible_distribution_major_version == '8' or ansible_distribution_major_version == '9'"
+      register: disable_postgresql_module
+      changed_when:
+        - "disable_postgresql_module.rc == 0"
+        - "'Disabling modules:\\n postgresql' in disable_postgresql_module.stdout"
 
-    - name: PostgreSQL | Install PostgreSQL | yum
+    - name: PostgreSQL | Install PostgreSQL | RHEL
       ansible.builtin.yum:
         name:
           - "postgresql{{ postgresql_version_terse }}-server"
           - "postgresql{{ postgresql_version_terse }}"
           - "postgresql{{ postgresql_version_terse }}-contrib"
         state: present
+        update_cache: yes
       environment: "{{ postgresql_env }}"
 
-    - name: PostgreSQL | Setup service users profile | yum
+    - name: PostgreSQL | Setup service users profile | RHEL
       ansible.builtin.template:
         src: pgsql_profile.j2
         dest: "~{{ postgresql_service_user }}/.pgsql_profile"
@@ -41,7 +48,7 @@
         mode: 0700
       when: postgresql_service_user_pgsql_profile
 
-    - name: PostgreSQL | Create ~/pgtab.example | yum
+    - name: PostgreSQL | Create ~/pgtab.example | RHEL
       ansible.builtin.template:
         src: pgtab.j2
         dest: "~{{ postgresql_service_user }}/pgtab.example"
@@ -50,7 +57,7 @@
         mode: 0644
       when: postgresql_service_user_pgsql_profile
 
-    - name: PostgreSQL | Create ~/pgtab header | yum
+    - name: PostgreSQL | Create ~/pgtab header | RHEL
       ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
@@ -62,7 +69,7 @@
         line: "#  pgclustername : pgtabversion : pgrelease : pgport : pgdatabase : pgroot : pgbindir : [pgdata] : [pgwalarch] : [pgbackups]"
       when: postgresql_service_user_pgsql_profile
 
-    - name: PostgreSQL | Create ~/pgtab Ansible warning | yum
+    - name: PostgreSQL | Create ~/pgtab Ansible warning | RHEL
       ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
@@ -73,17 +80,17 @@
         line: "#  NOTICE: This file is managed by Ansible. Do not modify it."
       when: postgresql_service_user_pgsql_profile
 
-    - name: PostgreSQL | Add database to ~/pgtab | yum
+    - name: PostgreSQL | Add database to ~/pgtab | RHEL
       ansible.builtin.lineinfile:
         path: "~{{ postgresql_service_user }}/pgtab"
         owner: "{{ postgresql_service_user }}"
         group: "{{ postgresql_service_group }}"
         mode: 0644
         regexp: "{{ postgresql_cluster_name }}:.*$"
-        line: "{{ postgresql_cluster_name }}:1:{{ postgresql_version }}:{{ postgresql_port }}:{{ postgresql_service_user }}:/var/lib/pgsql:/usr/pgsql-{{ postgresql_version }}/bin:{{ postgresql_data_directory }}:::"
+        line: "{{ postgresql_cluster_name }}:1:{{ postgresql_version }}:{{ postgresql_port }}:{{ postgresql_service_user }}:/var/lib/pgsql:/usr/pgsql-{{ postgresql_version }}/bin:{{ postgresql_data_directory }}:::" # yamllint disable-line rule:line-length
       when: postgresql_service_user_pgsql_profile
 
-    - name: PostgreSQL | PGTune | yum
+    - name: PostgreSQL | PGTune | RHEL
       ansible.builtin.yum:
         name: pgtune
         state: present

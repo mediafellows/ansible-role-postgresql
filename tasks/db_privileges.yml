@@ -1,0 +1,18 @@
+---
+
+- name: Setup users privileges on DBs
+  community.postgresql.postgresql_privs:
+    privs: "{{ item.privileges }}"  # SELECT,INSERT,UPDATE,...
+    type: "{{ item.type | default('table') }}"
+    schema: "{{ item.schema | default('public') }}"
+    objs: ALL_IN_SCHEMA
+    fail_on_role: true
+    role: "{{ item.user_name }}"
+    login_port: "{{ postgresql_port }}"
+    login_user: "{{ postgresql_admin_user }}"
+    login_db: "{{ item.database_name | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  no_log: "{{ postgresql_hide_passwords }}"
+  become: yes
+  become_user: "{{ postgresql_admin_user }}"
+  with_items: "{{ postgresql_privileges }}"
