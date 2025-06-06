@@ -1,6 +1,6 @@
 [![Ansible-Role Tests](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml/badge.svg)](https://github.com/mediafellows/ansible-role-postgresql/actions/workflows/ansible_test.yml)
 
-## Ansibl Role - PostgreSQL
+## Ansible Role - PostgreSQL
 
 Ansible role which installs and configures PostgreSQL, extensions, databases and users.
 
