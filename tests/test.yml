@@ -4,7 +4,7 @@
   hosts: localhost
   become: true
   vars:
-    postgresql_version: 12
+    postgresql_version: 17
     postgresql_port: 5433
     postgresql_databases:
       - name: foobar
